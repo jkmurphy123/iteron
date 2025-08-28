@@ -24,7 +24,7 @@ class Panel(QWidget):
         fm = self.fontMetrics()
         self.char_width = fm.averageCharWidth()
         self.char_height = fm.height()
-        
+
         # Layout
         self.layout = QVBoxLayout(self)
         top_margin = self.char_height if self.title else 1
@@ -123,7 +123,14 @@ class Panel(QWidget):
         self.scroll_area.setWidget(self.content_widget)
 
         # Adjust height if title exists
-        adjust = 2 if self.title else 0
+        if self.title:
+            if self.title_style == "floating":
+                adjust = 4
+            else:  
+                if self.title_style == "embedded":
+                    adjust = 3 
+        else:
+            adjust = 1
         self.setFixedSize(self.char_width * self.width_chars,
                           self.char_height * (self.height_chars - adjust))
 
@@ -179,13 +186,13 @@ class Panel(QWidget):
                 painter.drawText(char_w * 3, char_h, self.title)
                 painter.setPen(QColor(self.border_color))
                 painter.drawText(char_w * (3 + len(self.title)), char_h,
-                                 " ├" + "─" * (width - len(self.title) - 6) + "┐")
+                                 " ├" + "─" * (width - len(self.title) - 4) + "┐")
             elif self.title_style == "floating":
-                painter.drawText(0, char_h, "┌" + "─" * (width - 2) + "┐")
+                painter.drawText(0, char_h, "┌" + "─" * (width - 0) + "┐")
                 painter.setPen(QColor(self.title_color))
                 painter.drawText(0, char_h * 2, "│ " + self.title.ljust(width - 3) + "│")
                 painter.setPen(QColor(self.border_color))
-                painter.drawText(0, char_h * 3, "├" + "─" * (width - 2) + "┤")
+                painter.drawText(0, char_h * 3, "├" + "─" * (width - 0) + "┤")
             else:
                 painter.drawText(0, char_h, "┌" + "─" * (width - 2) + "┐")
         else:
