@@ -1,0 +1,38 @@
+{
+    "rows": 2,
+    "cols": 2,
+    "font_family": "Courier New",
+    "font_size": 12,
+    "panels": [
+        {
+            "title": "System Log",
+            "width": 50,
+            "height": 12,
+            "title_style": "embedded",
+            "border_color": "#00AAFF",
+            "title_color": "#FFFF00"
+        },
+        {
+            "title": "Graphics",
+            "width": 50,
+            "height": 12,
+            "title_style": "floating",
+            "border_color": "#FF00FF",
+            "title_color": "#FFFFFF"
+        },
+        {
+            "title": "Events",
+            "width": 50,
+            "height": 12,
+            "border_color": "#00FF00"
+        },
+        {
+            "title": "Status",
+            "width": 50,
+            "height": 12,
+            "title_style": "embedded",
+            "border_color": "#AAAAAA",
+            "title_color": "#FFFFFF"
+        }
+    ]
+}
