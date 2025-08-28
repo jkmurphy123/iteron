@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QLabel, QTextEdit
 from PyQt5.QtGui import QPainter, QFont, QColor, QPixmap
-from PyQt5.QtCore import Qt, QRect
+from PyQt5.QtCore import Qt
 
 
 class Panel(QWidget):
@@ -18,33 +18,120 @@ class Panel(QWidget):
         self.font_family = font_family
         self.font_size = font_size
 
-        # Monospaced font for authentic retro look
         self.font = QFont(self.font_family, self.font_size)
         self.setFont(self.font)
 
-        # Layout: scrollable content inside panel
+        # Layout
         self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(8, 8, 8, 8)  # leave space for border
+        self.layout.setContentsMargins(8, 8, 8, 8)
+
         self.scroll_area = QScrollArea(self)
         self.scroll_area.setWidgetResizable(True)
+        scrollbar_style = """ QScrollBar:vertical {
+                background: black;
+                width: 14px;
+                margin: 0px;
+            }
+
+            QScrollBar::handle:vertical {
+                background: #888888;
+                min-height: 20px;
+            }
+
+            QScrollBar::handle:vertical:hover {
+                background: #AAAAAA;
+            }
+
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {
+                background: #666666;
+                height: 14px;
+                subcontrol-origin: margin;
+            }
+
+            QScrollBar::add-line:vertical:hover,
+            QScrollBar::sub-line:vertical:hover {
+                background: #AAAAAA;
+            }
+
+            QScrollBar::up-arrow:vertical,
+            QScrollBar::down-arrow:vertical {
+                width: 10px;
+                height: 10px;
+                background: #CCCCCC;
+            }
+
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {
+                background: black;
+            }
+
+
+            /* Horizontal Scrollbar */
+            QScrollBar:horizontal {
+                background: black;
+                height: 14px;
+                margin: 0px;
+            }
+
+            QScrollBar::handle:horizontal {
+                background: #888888;
+                min-width: 20px;
+            }
+
+            QScrollBar::handle:horizontal:hover {
+                background: #AAAAAA;
+            }
+
+            QScrollBar::add-line:horizontal,
+            QScrollBar::sub-line:horizontal {
+                background: #666666;
+                width: 14px;
+                subcontrol-origin: margin;
+            }
+
+            QScrollBar::add-line:horizontal:hover,
+            QScrollBar::sub-line:horizontal:hover {
+                background: #AAAAAA;
+            }
+
+            QScrollBar::left-arrow:horizontal,
+            QScrollBar::right-arrow:horizontal {
+                width: 10px;
+                height: 10px;
+                background: #CCCCCC;
+            }
+
+            QScrollBar::add-page:horizontal,
+            QScrollBar::sub-page:horizontal {
+                background: black;
+            }
+        """
+        self.scroll_area.setStyleSheet(
+            f"background-color: black; border: none; {scrollbar_style}"
+        )
         self.layout.addWidget(self.scroll_area)
 
-        # Current content widget inside scroll area
-        self.content_widget = QLabel("")  # default empty
+        # Start with empty content
+        self.content_widget = QLabel("")
+        self.content_widget.setStyleSheet(f"background-color: black; color: {self.border_color};")
         self.scroll_area.setWidget(self.content_widget)
 
-        # Calculate pixel size based on char width/height
         fm = self.fontMetrics()
         self.char_width = fm.averageCharWidth()
         self.char_height = fm.height()
+
+        # Adjust height if title exists
+        adjust = 1 if self.title else 0
         self.setFixedSize(self.char_width * self.width_chars,
-                          self.char_height * self.height_chars)
+                          self.char_height * (self.height_chars + adjust))
 
     def set_text(self, text: str):
         text_edit = QTextEdit()
         text_edit.setFont(self.font)
         text_edit.setPlainText(text)
         text_edit.setReadOnly(True)
+        text_edit.setStyleSheet(f"background-color: black; color: {self.border_color}; border: none;")
         self.scroll_area.setWidget(text_edit)
         self.content_widget = text_edit
         self.update()
@@ -58,12 +145,15 @@ class Panel(QWidget):
         else:
             label.setText("[Image not found]")
             label.setAlignment(Qt.AlignCenter)
+            label.setStyleSheet(f"color: {self.border_color};")
+        label.setStyleSheet("background-color: black; border: none;")
         self.scroll_area.setWidget(label)
         self.content_widget = label
         self.update()
 
     def clear_content(self):
         label = QLabel("")
+        label.setStyleSheet(f"background-color: black; color: {self.border_color}; border: none;")
         self.scroll_area.setWidget(label)
         self.content_widget = label
         self.update()
@@ -72,48 +162,37 @@ class Panel(QWidget):
         painter = QPainter(self)
         painter.setFont(self.font)
 
-        # Draw border with box-drawing characters
         border_pen = QColor(self.border_color)
         painter.setPen(border_pen)
 
         width = self.width_chars
         height = self.height_chars
-
-        # Precompute positions
         char_w = self.char_width
         char_h = self.char_height
 
-        # Top border (depending on style)
+        # Draw top border
         if self.title:
             if self.title_style == "embedded":
-                left = "┌─┤ "
-                right = " ├" + "─" * (width - len(self.title) - 6) + "┐"
-                line = left + self.title + right
-                # Draw title in mixed colors
                 painter.drawText(0, char_h, "┌─┤ ")
                 painter.setPen(QColor(self.title_color))
                 painter.drawText(char_w * 3, char_h, self.title)
                 painter.setPen(QColor(self.border_color))
-                painter.drawText(char_w * (3 + len(self.title)), char_h, " ├" + "─" * (width - len(self.title) - 6) + "┐")
+                painter.drawText(char_w * (3 + len(self.title)), char_h,
+                                 " ├" + "─" * (width - len(self.title) - 6) + "┐")
             elif self.title_style == "floating":
-                top_line = "┌" + "─" * (width - 2) + "┐"
-                title_line = "│ " + self.title.ljust(width - 3) + "│"
-                sep_line = "├" + "─" * (width - 2) + "┤"
-                painter.drawText(0, char_h, top_line)
+                painter.drawText(0, char_h, "┌" + "─" * (width - 2) + "┐")
                 painter.setPen(QColor(self.title_color))
-                painter.drawText(0, char_h * 2, title_line)
+                painter.drawText(0, char_h * 2, "│ " + self.title.ljust(width - 3) + "│")
                 painter.setPen(QColor(self.border_color))
-                painter.drawText(0, char_h * 3, sep_line)
-            else:  # no title
-                top_line = "┌" + "─" * (width - 2) + "┐"
-                painter.drawText(0, char_h, top_line)
+                painter.drawText(0, char_h * 3, "├" + "─" * (width - 2) + "┤")
+            else:
+                painter.drawText(0, char_h, "┌" + "─" * (width - 2) + "┐")
         else:
-            top_line = "┌" + "─" * (width - 2) + "┐"
-            painter.drawText(0, char_h, top_line)
+            painter.drawText(0, char_h, "┌" + "─" * (width - 2) + "┐")
 
         # Bottom border
-        bottom_line = "└" + "─" * (width - 2) + "┘"
-        painter.drawText(0, char_h * height, bottom_line)
+        painter.setPen(QColor(self.border_color))
+        painter.drawText(0, char_h * height, "└" + "─" * (width - 2) + "┘")
 
         # Side borders
         for row in range(2, height):

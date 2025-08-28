@@ -20,6 +20,7 @@ def main():
     font_size = config.get("font_size", 12)
 
     window = QWidget()
+    window.setStyleSheet("background-color: black;")
     layout = QGridLayout(window)
 
     panels_config = config.get("panels", [])
