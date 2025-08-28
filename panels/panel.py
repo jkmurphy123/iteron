@@ -122,9 +122,9 @@ class Panel(QWidget):
         self.char_height = fm.height()
 
         # Adjust height if title exists
-        adjust = 1 if self.title else 0
+        adjust = 2 if self.title else 0
         self.setFixedSize(self.char_width * self.width_chars,
-                          self.char_height * (self.height_chars + adjust))
+                          self.char_height * (self.height_chars - adjust))
 
     def set_text(self, text: str):
         text_edit = QTextEdit()
