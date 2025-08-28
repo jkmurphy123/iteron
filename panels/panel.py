@@ -23,7 +23,8 @@ class Panel(QWidget):
 
         # Layout
         self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(8, 8, 8, 8)
+        top_margin = self.char_height if self.title else 1
+        self.layout.setContentsMargins(8, top_margin, 8, 8)
 
         self.scroll_area = QScrollArea(self)
         self.scroll_area.setWidgetResizable(True)
