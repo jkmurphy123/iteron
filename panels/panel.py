@@ -21,6 +21,10 @@ class Panel(QWidget):
         self.font = QFont(self.font_family, self.font_size)
         self.setFont(self.font)
 
+        fm = self.fontMetrics()
+        self.char_width = fm.averageCharWidth()
+        self.char_height = fm.height()
+        
         # Layout
         self.layout = QVBoxLayout(self)
         top_margin = self.char_height if self.title else 1
@@ -117,10 +121,6 @@ class Panel(QWidget):
         self.content_widget = QLabel("")
         self.content_widget.setStyleSheet(f"background-color: black; color: {self.border_color};")
         self.scroll_area.setWidget(self.content_widget)
-
-        fm = self.fontMetrics()
-        self.char_width = fm.averageCharWidth()
-        self.char_height = fm.height()
 
         # Adjust height if title exists
         adjust = 2 if self.title else 0
